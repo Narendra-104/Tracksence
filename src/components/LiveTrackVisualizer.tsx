@@ -324,7 +324,8 @@ export const LiveTrackVisualizer: React.FC<LiveTrackVisualizerProps> = ({
       ctx.beginPath();
       ctx.moveTo(wx, wy);
       ctx.lineTo(wx + Math.cos(spokeAngle) * WHEEL_R * 0.85, wy + Math.sin(spokeAngle) * WHEEL_R * 0.85);
-        ctx.lineTo(wx + Math.cos(spokeAngle) * WHEEL_R * 1.0, wy + Math.sin(spokeAngle) * WHEEL_R * 1.0);
+      ctx.moveTo(wx, wy);
+      ctx.lineTo(wx + Math.cos(spokeAngle) * WHEEL_R * 1.0, wy + Math.sin(spokeAngle) * WHEEL_R * 1.0);
       ctx.stroke();
     });
 
