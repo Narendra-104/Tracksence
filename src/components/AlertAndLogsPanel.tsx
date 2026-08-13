@@ -6,14 +6,9 @@ import {
   Trash2, 
   MapPin, 
   AlertTriangle, 
-  ShieldAlert, 
-  Filter, 
-  ExternalLink,
-  Volume2,
-  VolumeX,
-  FileSpreadsheet
+  Filter
 } from 'lucide-react';
-import { DefectRecord, SeverityLevel } from '../types';
+import { DefectRecord } from '../types';
 
 interface AlertAndLogsPanelProps {
   defects: DefectRecord[];
@@ -28,8 +23,6 @@ interface AlertAndLogsPanelProps {
 export const AlertAndLogsPanel: React.FC<AlertAndLogsPanelProps> = ({
   defects,
   activeAlert,
-  isMuted,
-  onToggleMute,
   onJumpToPosition,
   onClearLogs,
   onOpenDefectDetail
@@ -72,31 +65,30 @@ export const AlertAndLogsPanel: React.FC<AlertAndLogsPanelProps> = ({
   };
 
   return (
-    <div className="bg-slate-900 rounded-2xl border border-slate-800 p-4 sm:p-5 shadow-xl flex flex-col justify-between">
+    <div className="bg-slate-900/90 rounded-xl border border-slate-800 p-4 sm:p-5 shadow-sm flex flex-col justify-between">
       {/* Top Header & Visual Buzzer LED Bar */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-800">
-        <div className="flex items-center space-x-3">
-          {/* Flashing Visual LED Buzzer Widget */}
-          <div className={`p-2.5 rounded-xl border flex items-center justify-center transition-all ${
+        <div className="flex items-center space-x-2.5">
+          <div className={`p-2 rounded-lg border flex items-center justify-center transition-all ${
             activeAlert 
-              ? 'bg-red-500/30 border-red-500 text-red-400 animate-pulse shadow-lg shadow-red-500/30' 
-              : 'bg-slate-800 border-slate-700 text-slate-400'
+              ? 'bg-red-500/20 border-red-500/40 text-red-400' 
+              : 'bg-slate-800 border-slate-700/60 text-slate-400'
           }`}>
-            <Bell className={`w-5 h-5 ${activeAlert ? 'animate-bounce' : ''}`} />
+            <Bell className="w-4 h-4" />
           </div>
 
           <div>
             <div className="flex items-center space-x-2">
-              <h2 className="text-sm font-bold text-slate-100 font-mono tracking-tight uppercase">
-                DEFECT LOG & BUZZER / LED ALERT SYSTEM
+              <h2 className="text-xs font-bold text-slate-100 font-mono uppercase tracking-wide">
+                DEFECT LOG & ALERT SYSTEM
               </h2>
               {activeAlert && (
-                <span className="bg-red-500/20 text-red-400 border border-red-500/40 text-[10px] font-mono px-2 py-0.5 rounded font-bold animate-pulse">
-                  🔔 BUZZER + 🔴 LED ALARM ACTIVE
+                <span className="bg-red-500/10 text-red-400 border border-red-500/30 text-[10px] font-mono px-2 py-0.5 rounded font-bold">
+                  ALARM ACTIVE
                 </span>
               )}
             </div>
-            <p className="text-xs text-slate-400">RPi 4 Fusion Engine → Buzzer beep + LED red on defect detection</p>
+            <p className="text-[11px] text-slate-400">Timestamped sensor anomaly records logged in real time</p>
           </div>
         </div>
 
@@ -105,7 +97,7 @@ export const AlertAndLogsPanel: React.FC<AlertAndLogsPanelProps> = ({
           <button
             onClick={handleExportCSV}
             disabled={defects.length === 0}
-            className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-slate-300 transition-colors border border-slate-700 flex items-center space-x-1.5 font-mono"
+            className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-slate-300 transition-colors border border-slate-700/60 flex items-center space-x-1.5 font-mono text-xs"
           >
             <Download className="w-3.5 h-3.5 text-cyan-400" />
             <span>Export CSV</span>
@@ -114,7 +106,7 @@ export const AlertAndLogsPanel: React.FC<AlertAndLogsPanelProps> = ({
           <button
             onClick={onClearLogs}
             disabled={defects.length === 0}
-            className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-slate-400 hover:text-red-400 transition-colors border border-slate-700"
+            className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-slate-400 hover:text-red-400 transition-colors border border-slate-700/60"
             title="Clear defect log"
           >
             <Trash2 className="w-3.5 h-3.5" />
@@ -132,12 +124,12 @@ export const AlertAndLogsPanel: React.FC<AlertAndLogsPanelProps> = ({
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search location or defect type..."
-            className="w-full bg-slate-950 border border-slate-800 rounded-lg pl-8 pr-3 py-1.5 text-slate-200 placeholder-slate-600 focus:outline-none focus:border-amber-500/50"
+            className="w-full bg-slate-950/60 border border-slate-800 rounded-lg pl-8 pr-3 py-1.5 text-slate-200 placeholder-slate-600 focus:outline-none focus:border-amber-500/50"
           />
         </div>
 
         {/* Severity Dropdown */}
-        <div className="flex items-center space-x-1.5 bg-slate-950 border border-slate-800 rounded-lg px-2 py-1">
+        <div className="flex items-center space-x-1.5 bg-slate-950/60 border border-slate-800 rounded-lg px-2.5 py-1">
           <Filter className="w-3.5 h-3.5 text-slate-500" />
           <select
             value={severityFilter}
@@ -154,7 +146,7 @@ export const AlertAndLogsPanel: React.FC<AlertAndLogsPanelProps> = ({
       </div>
 
       {/* Auto-Populating Defect Table */}
-      <div className="bg-slate-950 rounded-xl border border-slate-800 overflow-x-auto max-h-60 overflow-y-auto font-mono text-xs">
+      <div className="bg-slate-950/60 rounded-lg border border-slate-800 overflow-x-auto max-h-60 overflow-y-auto font-mono text-xs">
         <table className="w-full text-left text-slate-300 border-collapse">
           <thead className="bg-slate-900/90 sticky top-0 border-b border-slate-800 text-[11px] text-slate-400">
             <tr>
@@ -170,8 +162,8 @@ export const AlertAndLogsPanel: React.FC<AlertAndLogsPanelProps> = ({
           <tbody className="divide-y divide-slate-800/60">
             {filteredDefects.length === 0 ? (
               <tr>
-                <td colSpan={7} className="p-8 text-center text-slate-500">
-                  <AlertTriangle className="w-6 h-6 mx-auto mb-1 opacity-40 text-amber-500" />
+                <td colSpan={7} className="p-6 text-center text-slate-500">
+                  <AlertTriangle className="w-5 h-5 mx-auto mb-1 opacity-40 text-amber-500" />
                   <span>No defect records logged for current run. Track is nominal.</span>
                 </td>
               </tr>
@@ -192,7 +184,7 @@ export const AlertAndLogsPanel: React.FC<AlertAndLogsPanelProps> = ({
                     </td>
 
                     <td className="p-2.5 font-medium text-slate-200 whitespace-nowrap flex items-center gap-1.5">
-                      <span className={`w-1.5 h-1.5 rounded-full ${isCritical ? 'bg-red-500 animate-ping' : 'bg-amber-400'}`} />
+                      <span className={`w-1.5 h-1.5 rounded-full ${isCritical ? 'bg-red-500' : 'bg-amber-400'}`} />
                       <span>{d.defectType}</span>
                     </td>
 
@@ -205,10 +197,10 @@ export const AlertAndLogsPanel: React.FC<AlertAndLogsPanelProps> = ({
                     <td className="p-2.5 whitespace-nowrap">
                       <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
                         d.confidenceScore >= 70
-                          ? 'bg-red-500/20 text-red-400 border border-red-500/40'
+                          ? 'bg-red-500/10 text-red-400 border border-red-500/30'
                           : d.confidenceScore >= 40
-                          ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40'
-                          : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
+                          ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30'
+                          : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
                       }`}>
                         {d.confidenceScore}%
                       </span>
@@ -220,7 +212,7 @@ export const AlertAndLogsPanel: React.FC<AlertAndLogsPanelProps> = ({
                           e.stopPropagation();
                           onJumpToPosition(d.location);
                         }}
-                        className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-cyan-400 hover:text-cyan-300 rounded text-[10px] border border-slate-700 inline-flex items-center space-x-1"
+                        className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-cyan-400 hover:text-cyan-300 rounded text-[10px] border border-slate-700/60 inline-flex items-center space-x-1"
                         title="Jump trolley to location"
                       >
                         <MapPin className="w-3 h-3" />

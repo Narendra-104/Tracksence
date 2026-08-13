@@ -1,16 +1,9 @@
 import React, { useState } from 'react';
 import { 
-  Play, 
-  Pause, 
-  RotateCcw, 
-  Repeat, 
   Zap, 
   Sliders, 
   PlusCircle, 
   Activity, 
-  Gauge, 
-  Sparkles,
-  FastForward,
   ChevronRight
 } from 'lucide-react';
 import { DefectType, DriveDirection, PresetScenario, SeverityLevel } from '../types';
@@ -37,21 +30,8 @@ interface DemoControlPanelProps {
 }
 
 export const DemoControlPanel: React.FC<DemoControlPanelProps> = ({
-  isPlaying,
-  onTogglePlay,
-  onStopRun,
-  onReset,
-  speed,
-  onChangeSpeed,
-  isLooping,
-  onToggleLoop,
-  direction = 'FORWARD',
-  onChangeDirection,
-  targetDistance = 2.50,
-  onChangeTargetDistance,
   trackLength = 2.50,
   onChangeTrackLength,
-  onStartFromPosition,
   onInjectPresetScenario,
   onInjectCustomDefect,
   currentPosition
@@ -68,18 +48,18 @@ export const DemoControlPanel: React.FC<DemoControlPanelProps> = ({
   };
 
   return (
-    <div className="bg-slate-900 rounded-2xl border border-slate-800 p-4 sm:p-5 shadow-xl flex flex-col justify-between">
+    <div className="bg-slate-900/90 rounded-xl border border-slate-800 p-4 sm:p-5 shadow-sm flex flex-col justify-between h-full">
       {/* Header */}
       <div className="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
         <div className="flex items-center space-x-2">
-          <div className="p-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400">
+          <div className="p-1.5 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400">
             <Sliders className="w-4 h-4" />
           </div>
           <div>
-            <h2 className="text-sm font-bold text-slate-100 font-mono uppercase tracking-wide">
-              BO MOTOR + L298N DRIVER CONTROLLER
+            <h2 className="text-xs font-bold text-slate-100 font-mono uppercase tracking-wide">
+              TRACK SETUP & ANOMALY SIMULATOR
             </h2>
-            <p className="text-xs text-slate-400">Track size, BO motor drive, encoder distance & direction controls</p>
+            <p className="text-[11px] text-slate-400">Configure track size and trigger test scenarios</p>
           </div>
         </div>
 
@@ -89,7 +69,7 @@ export const DemoControlPanel: React.FC<DemoControlPanelProps> = ({
             setCustomLoc(Number(currentPosition.toFixed(2)));
             setShowCustomModal(!showCustomModal);
           }}
-          className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-400 hover:text-amber-300 transition-colors border border-slate-700 text-xs font-mono font-bold flex items-center space-x-1.5"
+          className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-400 transition-colors border border-slate-700/60 text-xs font-mono font-semibold flex items-center space-x-1.5"
         >
           <PlusCircle className="w-3.5 h-3.5" />
           <span>Custom Anomaly</span>
@@ -100,13 +80,13 @@ export const DemoControlPanel: React.FC<DemoControlPanelProps> = ({
       <div className="space-y-4 font-mono">
 
         {/* Section 0: Track Size / Total Trackbed Length Selector */}
-        <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-2.5">
+        <div className="bg-slate-950/60 p-3 rounded-xl border border-slate-800/80 space-y-2">
           <div className="flex items-center justify-between text-xs">
             <span className="text-slate-400 font-semibold flex items-center gap-1.5">
               <Activity className="w-3.5 h-3.5 text-cyan-400" />
-              <span>CONFIGURE TRACK SIZE / LENGTH:</span>
+              <span>CONFIGURE TRACK SIZE:</span>
             </span>
-            <span className="text-cyan-400 font-bold text-sm">{trackLength.toFixed(2)} meters</span>
+            <span className="text-cyan-400 font-bold text-xs">{trackLength.toFixed(2)} meters</span>
           </div>
 
           {/* Quick Track Size Presets */}
@@ -115,9 +95,9 @@ export const DemoControlPanel: React.FC<DemoControlPanelProps> = ({
               <button
                 key={len}
                 onClick={() => onChangeTrackLength?.(len)}
-                className={`py-1.5 rounded-lg border font-bold transition-all ${
+                className={`py-1 rounded-lg border font-bold transition-all ${
                   Math.abs(trackLength - len) < 0.05
-                    ? 'bg-cyan-500/20 border-cyan-500 text-cyan-300 shadow-md shadow-cyan-500/10'
+                    ? 'bg-cyan-500/10 border-cyan-500/40 text-cyan-300'
                     : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200'
                 }`}
               >
@@ -147,68 +127,68 @@ export const DemoControlPanel: React.FC<DemoControlPanelProps> = ({
         <div>
           <label className="text-xs text-slate-400 font-semibold mb-2 block flex items-center gap-1.5">
             <Zap className="w-3.5 h-3.5 text-amber-400" />
-            <span>INJECT SYNTHETIC SCENARIOS ON 2.5m TRACK:</span>
+            <span>PRESET ANOMALY SCENARIOS:</span>
           </label>
 
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs">
             {/* Scenario 1: Nominal Smooth */}
             <button
               onClick={() => onInjectPresetScenario('smooth')}
-              className="p-2.5 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:border-emerald-500/50 transition-all text-left group"
+              className="p-2 rounded-xl bg-slate-950/60 hover:bg-slate-800/60 border border-slate-800 text-slate-300 transition-all text-left group"
             >
-              <div className="text-emerald-400 font-bold mb-0.5 flex items-center justify-between">
-                <span>🟢 Nominal Track</span>
+              <div className="text-emerald-400 font-bold mb-0.5 flex items-center justify-between text-[11px]">
+                <span>🟢 Nominal</span>
                 <ChevronRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
               </div>
-              <p className="text-[10px] text-slate-500">Smooth baseline, no defect</p>
+              <p className="text-[10px] text-slate-500">Smooth track</p>
             </button>
 
             {/* Scenario 2: Corrugation */}
             <button
               onClick={() => onInjectPresetScenario('corrugation')}
-              className="p-2.5 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:border-amber-500/50 transition-all text-left group"
+              className="p-2 rounded-xl bg-slate-950/60 hover:bg-slate-800/60 border border-slate-800 text-slate-300 transition-all text-left group"
             >
-              <div className="text-amber-400 font-bold mb-0.5 flex items-center justify-between">
+              <div className="text-amber-400 font-bold mb-0.5 flex items-center justify-between text-[11px]">
                 <span>🟠 Corrugation</span>
                 <ChevronRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
               </div>
-              <p className="text-[10px] text-slate-500">Vibration jolt @ 0.85m</p>
+              <p className="text-[10px] text-slate-500">Vibration jolt</p>
             </button>
 
             {/* Scenario 3: Loose Joint */}
             <button
               onClick={() => onInjectPresetScenario('loose_joint')}
-              className="p-2.5 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:border-amber-500/50 transition-all text-left group"
+              className="p-2 rounded-xl bg-slate-950/60 hover:bg-slate-800/60 border border-slate-800 text-slate-300 transition-all text-left group"
             >
-              <div className="text-amber-400 font-bold mb-0.5 flex items-center justify-between">
+              <div className="text-amber-400 font-bold mb-0.5 flex items-center justify-between text-[11px]">
                 <span>🟡 Loose Joint</span>
                 <ChevronRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
               </div>
-              <p className="text-[10px] text-slate-500">Fishplate gap @ 1.45m</p>
+              <p className="text-[10px] text-slate-500">Fishplate gap</p>
             </button>
 
             {/* Scenario 4: Gauge Widening */}
             <button
               onClick={() => onInjectPresetScenario('gauge_widening')}
-              className="p-2.5 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:border-indigo-500/50 transition-all text-left group"
+              className="p-2 rounded-xl bg-slate-950/60 hover:bg-slate-800/60 border border-slate-800 text-slate-300 transition-all text-left group"
             >
-              <div className="text-indigo-400 font-bold mb-0.5 flex items-center justify-between">
+              <div className="text-indigo-400 font-bold mb-0.5 flex items-center justify-between text-[11px]">
                 <span>🟣 Gauge Spread</span>
                 <ChevronRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
               </div>
-              <p className="text-[10px] text-slate-500">Laser +14mm @ 1.95m</p>
+              <p className="text-[10px] text-slate-500">Laser +14mm</p>
             </button>
 
             {/* Scenario 5: Combined Critical */}
             <button
               onClick={() => onInjectPresetScenario('combined_critical')}
-              className="p-2.5 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:border-red-500/50 transition-all text-left group col-span-2 sm:col-span-1"
+              className="p-2 rounded-xl bg-slate-950/60 hover:bg-slate-800/60 border border-slate-800 text-slate-300 transition-all text-left group col-span-2 sm:col-span-1"
             >
-              <div className="text-red-400 font-bold mb-0.5 flex items-center justify-between">
-                <span>🔴 Critical Flaw</span>
+              <div className="text-red-400 font-bold mb-0.5 flex items-center justify-between text-[11px]">
+                <span>🔴 Critical</span>
                 <ChevronRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
               </div>
-              <p className="text-[10px] text-slate-500">Multi-sensor @ 1.20m</p>
+              <p className="text-[10px] text-slate-500">Multi-sensor flaw</p>
             </button>
           </div>
         </div>
@@ -217,11 +197,11 @@ export const DemoControlPanel: React.FC<DemoControlPanelProps> = ({
       {/* Custom Injector Modal Dialog */}
       {showCustomModal && (
         <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-5 shadow-2xl font-mono">
+          <div className="bg-slate-900 border border-slate-800 rounded-xl max-w-md w-full p-5 shadow-2xl font-mono">
             <div className="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
-              <h3 className="text-sm font-bold text-amber-400 flex items-center gap-2">
+              <h3 className="text-xs font-bold text-amber-400 flex items-center gap-2">
                 <PlusCircle className="w-4 h-4" />
-                <span>INJECT CUSTOM SYNTHETIC ANOMALY</span>
+                <span>INJECT CUSTOM ANOMALY</span>
               </h3>
               <button
                 onClick={() => setShowCustomModal(false)}
@@ -235,13 +215,13 @@ export const DemoControlPanel: React.FC<DemoControlPanelProps> = ({
               {/* Meter Location Slider */}
               <div>
                 <label className="text-slate-400 block mb-1">
-                  Track Location Marker (0.10m to 2.40m):
+                  Track Location Marker:
                 </label>
                 <div className="flex items-center space-x-3">
                   <input
                     type="range"
                     min="0.10"
-                    max="2.40"
+                    max={Math.max(0.2, trackLength - 0.1)}
                     step="0.05"
                     value={customLoc}
                     onChange={(e) => setCustomLoc(parseFloat(e.target.value))}
@@ -299,7 +279,7 @@ export const DemoControlPanel: React.FC<DemoControlPanelProps> = ({
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-bold rounded-lg hover:from-amber-400 hover:to-amber-500 shadow-md shadow-amber-500/20"
+                  className="px-4 py-1.5 bg-amber-500 text-slate-950 font-bold rounded-lg hover:bg-amber-400 shadow-sm"
                 >
                   Inject Anomaly
                 </button>

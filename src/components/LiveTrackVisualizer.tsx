@@ -483,42 +483,41 @@ export const LiveTrackVisualizer: React.FC<LiveTrackVisualizerProps> = ({
   const gridTicks = [0, 0.2, 0.4, 0.6, 0.8, 1].map(f => Number((f * trackLength).toFixed(1)));
 
   return (
-    <div className="bg-slate-900 rounded-2xl border border-slate-800 p-4 sm:p-5 shadow-xl relative overflow-hidden">
+    <div className="bg-slate-900/90 rounded-xl border border-slate-800 p-4 sm:p-5 shadow-sm relative overflow-hidden">
 
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-2 mb-4 pb-3 border-b border-slate-800/80">
+      <div className="flex flex-wrap items-center justify-between gap-2 mb-4 pb-3 border-b border-slate-800">
         <div className="flex items-center space-x-2">
-          <div className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping" />
-          <h2 className="text-sm font-bold text-slate-100 uppercase tracking-wider font-mono flex items-center gap-2">
-            <span>Mock Track Testbed — Laser + MPU6050 Fusion</span>
-            <span className="bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 text-[10px] px-2 py-0.5 rounded">
-              SIZE: {trackLength.toFixed(2)} m
+          <div className="w-2 h-2 rounded-full bg-amber-400" />
+          <h2 className="text-xs font-bold text-slate-100 uppercase tracking-wide font-mono flex items-center gap-2">
+            <span>LIVE TRACK TELEMETRY VISUALIZER</span>
+            <span className="bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 text-[10px] px-2 py-0.5 rounded">
+              {trackLength.toFixed(2)} m
             </span>
           </h2>
         </div>
 
-        <div className="flex items-center space-x-3 text-xs">
+        <div className="flex items-center space-x-2 text-xs font-mono">
           <button
             onClick={() => setShowCameraFeed(!showCameraFeed)}
             className={`px-2.5 py-1 rounded-lg border transition-all flex items-center space-x-1.5 ${
-              showCameraFeed ? 'bg-amber-500/10 border-amber-500/30 text-amber-400' : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-slate-200'
+              showCameraFeed ? 'bg-amber-500/10 border-amber-500/30 text-amber-400' : 'bg-slate-800 border-slate-700/60 text-slate-400 hover:text-slate-200'
             }`}
           >
             <Eye className="w-3.5 h-3.5" />
-            <span>{showCameraFeed ? 'Hide Optical Camera' : 'Show Optical Camera'}</span>
+            <span>{showCameraFeed ? 'Hide Camera' : 'Show Camera'}</span>
           </button>
 
-          <div className="bg-slate-950 px-3 py-1 rounded-lg border border-slate-800 font-mono">
-            <span className="text-slate-500 mr-1.5">BO ENC POS:</span>
+          <div className="bg-slate-950/60 px-3 py-1 rounded-lg border border-slate-800 text-slate-300">
+            <span className="text-slate-500 mr-1.5">POS:</span>
             <span className="text-amber-400 font-bold">{currentPosition.toFixed(2)} m</span>
             <span className="text-slate-600 mx-1.5">/</span>
             <span className="text-slate-400">{trackLength.toFixed(2)} m</span>
           </div>
 
-          <div className="bg-slate-950 px-3 py-1 rounded-lg border border-slate-800 font-mono">
-            <span className="text-slate-500 mr-1.5">VELOCITY:</span>
+          <div className="bg-slate-950/60 px-3 py-1 rounded-lg border border-slate-800 text-slate-300">
+            <span className="text-slate-500 mr-1.5">SPEED:</span>
             <span className="text-cyan-400 font-bold">{speed.toFixed(2)} m/s</span>
-            <span className="ml-1 text-[10px] text-indigo-400 font-bold">({direction})</span>
           </div>
         </div>
       </div>

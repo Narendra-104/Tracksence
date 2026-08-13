@@ -403,21 +403,21 @@ export default function App() {
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-5">
 
         {/* ── DRIVE CONTROL BAR — above the track ── */}
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl px-4 py-3 shadow-xl flex flex-wrap items-center gap-3 font-mono">
+        <div className="bg-slate-900/90 border border-slate-800 rounded-xl px-4 py-3 shadow-sm flex flex-wrap items-center gap-3 font-mono text-xs">
 
           {/* Play / Pause */}
           <button
             onClick={handleTogglePlay}
-            className={`px-5 py-2 rounded-xl text-sm font-bold flex items-center space-x-2 shadow-lg transition-all ${
+            className={`px-4 py-2 rounded-lg font-bold flex items-center space-x-2 transition-all ${
               isPlaying
-                ? 'bg-amber-500 text-slate-950 hover:bg-amber-400 shadow-amber-500/20'
-                : 'bg-emerald-500 text-slate-950 hover:bg-emerald-400 shadow-emerald-500/20'
+                ? 'bg-amber-500 text-slate-950 hover:bg-amber-400'
+                : 'bg-emerald-500 text-slate-950 hover:bg-emerald-400'
             }`}
           >
             {isPlaying ? (
-              <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+              <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
             ) : (
-              <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+              <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
             )}
             <span>{isPlaying ? 'PAUSE' : 'START'}</span>
           </button>
@@ -426,54 +426,52 @@ export default function App() {
           {isPlaying && (
             <button
               onClick={handleStopRun}
-              className="px-4 py-2 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/40 text-sm font-bold transition-colors"
+              className="px-3 py-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 font-bold transition-colors"
             >
-              ⏹ STOP
+              STOP
             </button>
           )}
 
           {/* Reset */}
           <button
             onClick={handleResetRun}
-            className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium border border-slate-700 transition-colors"
+            className="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium border border-slate-700/60 transition-colors"
             title="Reset to 0.00m"
           >
-            ↺ RESET
+            RESET
           </button>
 
-          {/* Divider */}
-          <div className="w-px h-8 bg-slate-700 hidden sm:block" />
+          <div className="w-px h-6 bg-slate-800 hidden sm:block" />
 
           {/* Direction Toggle */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             <button
               onClick={() => setDirection('FORWARD')}
-              className={`px-3 py-2 rounded-xl text-xs font-bold border flex items-center gap-1.5 transition-all ${
+              className={`px-3 py-1.5 rounded-lg font-semibold border transition-all ${
                 direction === 'FORWARD'
-                  ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400'
-                  : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-slate-200'
+                  ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-400'
+                  : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:text-slate-200'
               }`}
             >
-              ▶ FORWARD
+              FORWARD
             </button>
             <button
               onClick={() => setDirection('REVERSE')}
-              className={`px-3 py-2 rounded-xl text-xs font-bold border flex items-center gap-1.5 transition-all ${
+              className={`px-3 py-1.5 rounded-lg font-semibold border transition-all ${
                 direction === 'REVERSE'
-                  ? 'bg-indigo-500/20 border-indigo-500 text-indigo-300'
-                  : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-slate-200'
+                  ? 'bg-indigo-500/10 border-indigo-500/40 text-indigo-300'
+                  : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:text-slate-200'
               }`}
             >
-              ◀ REVERSE
+              REVERSE
             </button>
           </div>
 
-          {/* Divider */}
-          <div className="w-px h-8 bg-slate-700 hidden sm:block" />
+          <div className="w-px h-6 bg-slate-800 hidden sm:block" />
 
           {/* Speed Slider */}
-          <div className="flex items-center gap-2 min-w-[160px] max-w-xs">
-            <span className="text-slate-400 text-[11px] whitespace-nowrap">⚡ SPEED:</span>
+          <div className="flex items-center gap-2 min-w-[150px] max-w-xs">
+            <span className="text-slate-400 text-[11px] whitespace-nowrap">SPEED:</span>
             <input
               type="range"
               min="0.2"
@@ -481,17 +479,16 @@ export default function App() {
               step="0.1"
               value={speed}
               onChange={(e) => setSpeed(parseFloat(e.target.value))}
-              className="flex-1 accent-amber-400 cursor-pointer h-1.5 rounded-lg"
+              className="flex-1 accent-amber-400 cursor-pointer h-1.5 bg-slate-800 rounded-lg"
             />
-            <span className="text-amber-400 font-bold text-xs w-14 text-right">{speed.toFixed(1)} m/s</span>
+            <span className="text-amber-400 font-bold text-xs w-12 text-right">{speed.toFixed(1)}m/s</span>
           </div>
 
-          {/* Divider */}
-          <div className="w-px h-8 bg-slate-700 hidden sm:block" />
+          <div className="w-px h-6 bg-slate-800 hidden sm:block" />
 
           {/* BO Encoder Run Distance Limit */}
-          <div className="flex items-center gap-2 min-w-[180px] max-w-xs">
-            <span className="text-slate-400 text-[11px] whitespace-nowrap">📏 DIST LIMIT:</span>
+          <div className="flex items-center gap-2 min-w-[160px] max-w-xs">
+            <span className="text-slate-400 text-[11px] whitespace-nowrap">LIMIT:</span>
             <input
               type="range"
               min="0.1"
@@ -499,29 +496,21 @@ export default function App() {
               step={trackLength > 20 ? "1" : "0.1"}
               value={targetDistance}
               onChange={(e) => setTargetDistance(parseFloat(e.target.value))}
-              className="flex-1 accent-cyan-400 cursor-pointer h-1.5 rounded-lg"
+              className="flex-1 accent-cyan-400 cursor-pointer h-1.5 bg-slate-800 rounded-lg"
             />
-            <span className="text-cyan-400 font-bold text-xs w-14 text-right">{targetDistance.toFixed(1)} m</span>
+            <span className="text-cyan-400 font-bold text-xs w-12 text-right">{targetDistance.toFixed(1)}m</span>
           </div>
 
           {/* Live position readout */}
           <div className="ml-auto bg-slate-950 border border-slate-800 px-3 py-1.5 rounded-lg flex items-center gap-2 text-xs">
-            <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+            <span className="w-2 h-2 rounded-full bg-amber-400" />
             <span className="text-slate-400">POS:</span>
             <span className="text-amber-400 font-bold">{position.toFixed(2)} m</span>
             <span className="text-slate-600">/</span>
             <span className="text-slate-400">{trackLength.toFixed(1)} m</span>
-            <span className={`ml-1 px-1.5 py-0.5 rounded text-[10px] font-bold border ${
-              isPlaying
-                ? direction === 'FORWARD'
-                  ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300'
-                  : 'bg-indigo-500/20 border-indigo-500/40 text-indigo-300'
-                : 'bg-slate-800 border-slate-700 text-slate-500'
-            }`}>
-              {isPlaying ? (direction === 'FORWARD' ? '⏩' : '⏪') : '⏸'}
-            </span>
           </div>
         </div>
+
 
         {/* Row 1: Interactive Track Visualizer */}
         <LiveTrackVisualizer
