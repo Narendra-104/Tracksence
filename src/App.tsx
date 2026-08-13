@@ -58,321 +58,190 @@ export default function App() {
       severity: 'HIGH',
       gaugeMm: 1690.0,
       vibrationG: 0.7,
-      confidenceScore: 82,
-      actionRequired: 'Re-gauge fasteners & check tie condition.',
+      confidenceScore: 85,
+      actionRequired: 'Gauge tie realignment and spike replacement mandatory.',
       acknowledged: false,
       sensorTriggers: { vibrationSpike: false, gaugeSpread: true, opticalAnomaly: true }
     }
   ]);
 
-  // Telemetry Stream
+  // Telemetry stream history
+  const [telemetryHistory, setTelemetryHistory] = useState<TelemetryPoint[]>([]);
+
+  // Current real-time telemetry frame
   const [currentTelemetry, setCurrentTelemetry] = useState<TelemetryPoint>({
-    timestamp: Date.now(),
     position: 0.0,
-    vibrationZ: 0.04,
-    vibrationY: 0.02,
+    speed: 0.8,
+    vibrationZ: 0.2,
+    vibrationY: 0.05,
     gaugeMm: 1676.0,
     gaugeDevMm: 0.0,
-    confidenceScore: 5,
+    cameraSharpness: 98,
+    confidenceScore: 12,
     status: 'NOMINAL',
-    laserSignalQuality: 98,
-    cameraSharpness: 95
+    timestamp: new Date().toLocaleTimeString()
   });
 
-  const [telemetryHistory, setTelemetryHistory] = useState<TelemetryPoint[]>([]);
-  const [activeAlert, setActiveAlert] = useState<boolean>(false);
-
-  // Modals
+  // UI Modal States
   const [isReportModalOpen, setIsReportModalOpen] = useState<boolean>(false);
   const [selectedDefectModal, setSelectedDefectModal] = useState<DefectRecord | null>(null);
+  const [activeAlert, setActiveAlert] = useState<boolean>(false);
 
-  // References for tick calculation
-  const lastTickTime = useRef<number>(performance.now());
-  const lastWheelClickPos = useRef<number>(0.0);
-  const runStartPosRef = useRef<number>(0.0);
-  const loggedZonesThisPass = useRef<Set<number>>(new Set());
-
-  // Handle Mute Toggle
-  const handleToggleMute = () => {
-    const nextMuted = !isMuted;
-    setIsMuted(nextMuted);
-    soundEngine.setMuted(nextMuted);
-  };
-
-  // Change Total Track Length / Size
-  const handleTrackLengthChange = (newLen: number) => {
-    const validLen = Math.max(1.0, Number(newLen.toFixed(2)));
-    setTrackLength(validLen);
-
-    // Adjust target distance & position if out of bounds
-    if (targetDistance > validLen || targetDistance === trackLength) {
-      setTargetDistance(validLen);
-    }
-    if (position > validLen) {
-      setPosition(validLen);
-    }
-
-    // Scale synthetic defect locations proportionally
-    const scaleRatio = validLen / trackLength;
-    setActiveDefectZones(prev =>
-      prev.map(z => ({ ...z, location: Number((z.location * scaleRatio).toFixed(2)) }))
-    );
-  };
-
-  // Toggle Play / Pause with position auto-adjustments
-  const handleTogglePlay = () => {
-    if (!isPlaying) {
-      let startP = position;
-      if (direction === 'FORWARD' && position >= trackLength) {
-        startP = 0.0;
-        setPosition(0.0);
-      } else if (direction === 'REVERSE' && position <= 0.0) {
-        startP = trackLength;
-        setPosition(trackLength);
-      }
-      runStartPosRef.current = startP;
-      lastWheelClickPos.current = startP;
-      setIsPlaying(true);
-    } else {
-      setIsPlaying(false);
-    }
-  };
-
-  const handleStopRun = () => {
-    setIsPlaying(false);
-  };
-
-  // Start from specific end position
-  const handleStartFromPosition = (startPos: number, dir?: DriveDirection) => {
-    const newDir = dir || (startPos >= trackLength ? 'REVERSE' : 'FORWARD');
-    setPosition(startPos);
-    setDirection(newDir);
-    runStartPosRef.current = startPos;
-    lastWheelClickPos.current = startPos;
-    setIsPlaying(true);
-  };
-
-  // Preset Scenario Injector
-  const handleInjectPresetScenario = (scenario: PresetScenario) => {
-    if (scenario === 'smooth') {
-      setActiveDefectZones([]);
-    } else if (scenario === 'corrugation') {
-      setActiveDefectZones([
-        { location: Number((trackLength * 0.34).toFixed(2)), defectType: 'Surface Corrugation', severity: 'HIGH', gaugeDevMm: 1.2, vibrationAmpG: 2.5 }
-      ]);
-    } else if (scenario === 'loose_joint') {
-      setActiveDefectZones([
-        { location: Number((trackLength * 0.58).toFixed(2)), defectType: 'Loose Joint / Fishplate Gap', severity: 'MEDIUM', gaugeDevMm: 3.5, vibrationAmpG: 2.1 }
-      ]);
-    } else if (scenario === 'gauge_widening') {
-      setActiveDefectZones([
-        { location: Number((trackLength * 0.78).toFixed(2)), defectType: 'Gauge Widening', severity: 'HIGH', gaugeDevMm: 14.5, vibrationAmpG: 0.6 }
-      ]);
-    } else if (scenario === 'combined_critical') {
-      setActiveDefectZones([
-        { location: Number((trackLength * 0.48).toFixed(2)), defectType: 'Rail Flaw / Crack', severity: 'CRITICAL', gaugeDevMm: 16.0, vibrationAmpG: 3.4 },
-        { location: Number((trackLength * 0.84).toFixed(2)), defectType: 'Surface Corrugation', severity: 'HIGH', gaugeDevMm: 2.0, vibrationAmpG: 2.3 }
-      ]);
-    }
-  };
-
-  // Custom Defect Injector
-  const handleInjectCustomDefect = (loc: number, type: DefectType, severity: SeverityLevel) => {
-    let gaugeDev = 2.0;
-    let ampG = 1.8;
-
-    if (type === 'Gauge Widening') {
-      gaugeDev = 14.0;
-      ampG = 0.8;
-    } else if (type === 'Surface Corrugation') {
-      gaugeDev = 1.0;
-      ampG = 2.6;
-    } else if (type === 'Loose Joint / Fishplate Gap') {
-      gaugeDev = 4.0;
-      ampG = 2.2;
-    } else if (type === 'Rail Flaw / Crack') {
-      gaugeDev = 15.0;
-      ampG = 3.2;
-    }
-
-    setActiveDefectZones(prev => [
-      ...prev.filter(z => Math.abs(z.location - loc) > 0.1),
-      { location: loc, defectType: type, severity, gaugeDevMm: gaugeDev, vibrationAmpG: ampG }
-    ]);
-  };
-
-  // Reset Trolley Position
-  const handleResetRun = () => {
-    setIsPlaying(false);
-    setPosition(0.0);
-    setDirection('FORWARD');
-    lastWheelClickPos.current = 0.0;
-    runStartPosRef.current = 0.0;
-    loggedZonesThisPass.current.clear();
-  };
-
-  // Seek Trolley Position
-  const handleSeekPosition = (pos: number) => {
-    const seekP = Math.min(trackLength, Math.max(0, pos));
-    setPosition(seekP);
-    lastWheelClickPos.current = seekP;
-    runStartPosRef.current = seekP;
-  };
-
-  // Jump to Position and open modal
-  const handleJumpToPosition = (loc: number) => {
-    setPosition(loc);
-    setIsPlaying(false);
-  };
-
-  // Main 60fps Telemetry Tick Loop
+  // Synchronize audio engine mute state
   useEffect(() => {
+    soundEngine.setMuted(isMuted);
+  }, [isMuted]);
+
+  // Master Simulation Loop
+  useEffect(() => {
+    let lastTime = performance.now();
     let animationFrameId: number;
 
     const tick = (now: number) => {
-      const dt = (now - lastTickTime.current) / 1000; // in seconds
-      lastTickTime.current = now;
-
-      let nextPos = position;
+      const deltaSec = Math.min((now - lastTime) / 1000, 0.1);
+      lastTime = now;
 
       if (isPlaying) {
-        const step = speed * dt;
+        // Calculate new position based on speed & direction
+        let nextPos = position;
+        const distStep = speed * deltaSec;
 
         if (direction === 'FORWARD') {
-          nextPos = position + step;
-          const covered = Math.max(0, nextPos - runStartPosRef.current);
+          nextPos += distStep;
 
-          // Wheel click audio
-          if (Math.abs(nextPos - lastWheelClickPos.current) >= 0.25) {
-            soundEngine.playWheelClick();
-            lastWheelClickPos.current = nextPos;
+          // Check target distance limit
+          if (nextPos >= targetDistance) {
+            nextPos = targetDistance;
+            setIsPlaying(false);
+            soundEngine.stopEngine();
           }
 
-          // Check limits against dynamic trackLength & targetDistance
-          if (covered >= targetDistance || nextPos >= trackLength) {
+          // Check end of track
+          if (nextPos >= trackLength) {
             if (isLooping) {
               nextPos = 0.0;
-              runStartPosRef.current = 0.0;
-              lastWheelClickPos.current = 0.0;
-              loggedZonesThisPass.current.clear();
             } else {
-              nextPos = Math.min(trackLength, Math.max(0, runStartPosRef.current + targetDistance));
+              nextPos = trackLength;
               setIsPlaying(false);
+              soundEngine.stopEngine();
             }
           }
         } else {
-          // REVERSE MODE
-          nextPos = position - step;
-          const covered = Math.max(0, runStartPosRef.current - nextPos);
+          // REVERSE direction
+          nextPos -= distStep;
 
-          if (Math.abs(nextPos - lastWheelClickPos.current) >= 0.25) {
-            soundEngine.playWheelClick();
-            lastWheelClickPos.current = nextPos;
-          }
-
-          if (covered >= targetDistance || nextPos <= 0.0) {
+          if (nextPos <= 0.0) {
             if (isLooping) {
               nextPos = trackLength;
-              runStartPosRef.current = trackLength;
-              lastWheelClickPos.current = trackLength;
-              loggedZonesThisPass.current.clear();
             } else {
-              nextPos = Math.max(0.0, Math.min(trackLength, runStartPosRef.current - targetDistance));
+              nextPos = 0.0;
               setIsPlaying(false);
+              soundEngine.stopEngine();
             }
           }
         }
 
         setPosition(nextPos);
-        setEncoderPulseAccumulator(prev => prev + Math.round(step * 1000));
+
+        // Update wheel rotation sound pitch
+        soundEngine.updateEngineSound(speed, true);
+
+        // Pulse count accumulator (e.g. 1000 pulses per meter)
+        setEncoderPulseAccumulator(Math.floor(nextPos * 1000));
+      } else {
+        soundEngine.stopEngine();
       }
 
-      // Check active defect proximity
-      let curVibZ = (Math.random() - 0.5) * 0.1; // Baseline rolling noise
-      let curVibY = (Math.random() - 0.5) * 0.05;
-      let curGaugeDev = (Math.random() - 0.5) * 0.4;
-      let matchedDefectZone: any = null;
+      // Check current position against configured defect zones
+      let currentVibZ = (Math.random() - 0.5) * 0.25;
+      let currentVibY = (Math.random() - 0.5) * 0.12;
+      let currentGaugeDev = (Math.random() - 0.5) * 0.8;
+      let currentScore = 12 + Math.random() * 5;
+      let currentStatus: 'NOMINAL' | 'ANOMALY' | 'DEFECT' = 'NOMINAL';
 
-      activeDefectZones.forEach(zone => {
-        const dist = Math.abs(nextPos - zone.location);
-        if (dist <= 0.08) {
-          // Gaussian proximity profile
-          const proximity = Math.exp(-Math.pow(dist / 0.03, 2));
-          curVibZ += (zone.vibrationAmpG + (Math.random() - 0.5) * 0.4) * proximity;
-          curVibY += (zone.vibrationAmpG * 0.4 + (Math.random() - 0.5) * 0.2) * proximity;
-          curGaugeDev += zone.gaugeDevMm * proximity;
-          matchedDefectZone = zone;
+      // Find if trolley is over a defect zone (within ±0.15m)
+      const nearbyDefect = activeDefectZones.find(d => Math.abs(d.location - position) < 0.15);
+
+      if (nearbyDefect) {
+        // Synthesize sensor readings for this defect type
+        if (nearbyDefect.defectType === 'Surface Corrugation' || nearbyDefect.defectType === 'Loose Joint / Fishplate Gap') {
+          currentVibZ = (Math.random() > 0.3 ? 1.0 : -1.0) * (nearbyDefect.vibrationAmpG + (Math.random() - 0.5) * 0.6);
         }
-      });
 
-      const measuredGauge = 1676.0 + curGaugeDev;
+        if (nearbyDefect.defectType === 'Gauge Widening') {
+          currentGaugeDev = nearbyDefect.gaugeDevMm + (Math.random() - 0.5) * 1.2;
+        }
 
-      // Sensor Fusion Score Calculation
-      const vibScore = Math.min(50, (Math.abs(curVibZ) / 2.5) * 50);
-      const gaugeScore = Math.min(50, (Math.abs(curGaugeDev) / 14) * 50);
-      const confidence = Math.round(Math.min(100, vibScore + gaugeScore));
+        if (nearbyDefect.defectType === 'Rail Flaw / Crack') {
+          currentVibZ = 1.8 + Math.random() * 0.8;
+          currentGaugeDev = 4.5 + Math.random() * 2.0;
+        }
 
-      let fusionStatus: 'NOMINAL' | 'ANOMALY' | 'DEFECT' = 'NOMINAL';
-      if (confidence >= 66) fusionStatus = 'DEFECT';
-      else if (confidence >= 35) fusionStatus = 'ANOMALY';
+        // Calculate AI confidence score
+        const vibFactor = Math.min(100, (Math.abs(currentVibZ) / 2.5) * 50);
+        const gaugeFactor = Math.min(100, (Math.abs(currentGaugeDev) / 15) * 50);
+        currentScore = Math.round(vibFactor + gaugeFactor);
 
-      setActiveAlert(confidence >= 66);
-
-      // Play Alert Sound if high confidence
-      if (confidence >= 66 && isPlaying) {
-        soundEngine.playAlertBuzzer('CRITICAL');
-      } else if (Math.abs(curVibZ) >= 1.5 && isPlaying) {
-        soundEngine.playJoltSound(Math.abs(curVibZ));
-      }
-
-      // Auto-Log Defect to Table if new anomaly found in this pass
-      if (matchedDefectZone && confidence >= 45 && !loggedZonesThisPass.current.has(matchedDefectZone.location)) {
-        loggedZonesThisPass.current.add(matchedDefectZone.location);
-
-        const newRecord: DefectRecord = {
-          id: `def-${Date.now()}`,
-          timestamp: new Date().toLocaleTimeString(),
-          location: matchedDefectZone.location,
-          defectType: matchedDefectZone.defectType,
-          severity: matchedDefectZone.severity,
-          gaugeMm: measuredGauge,
-          vibrationG: Math.abs(curVibZ),
-          confidenceScore: confidence,
-          actionRequired: matchedDefectZone.defectType === 'Surface Corrugation'
-            ? 'Schedule rail grinding.'
-            : matchedDefectZone.defectType === 'Gauge Widening'
-            ? 'Re-gauge tie fasteners.'
-            : 'Inspect joint bolt torque.',
-          acknowledged: false,
-          sensorTriggers: {
-            vibrationSpike: Math.abs(curVibZ) > 1.2,
-            gaugeSpread: Math.abs(curGaugeDev) > 6,
-            opticalAnomaly: true
+        if (currentScore > 65) {
+          currentStatus = 'DEFECT';
+          if (isPlaying) {
+            soundEngine.triggerJointClick();
+            soundEngine.triggerBuzzer();
+            setActiveAlert(true);
+            setTimeout(() => setActiveAlert(false), 2000);
           }
-        };
+        } else if (currentScore > 35) {
+          currentStatus = 'ANOMALY';
+        }
 
-        setDefectLogs(prev => [newRecord, ...prev]);
+        // Auto log new defect if not already logged at this location
+        if (isPlaying && currentStatus === 'DEFECT') {
+          setDefectLogs(prev => {
+            const exists = prev.some(item => Math.abs(item.location - nearbyDefect.location) < 0.2);
+            if (!exists) {
+              const newRecord: DefectRecord = {
+                id: `def-${Date.now().toString().slice(-4)}`,
+                timestamp: new Date().toLocaleTimeString(),
+                location: Number(nearbyDefect.location.toFixed(2)),
+                defectType: nearbyDefect.defectType,
+                severity: nearbyDefect.severity,
+                gaugeMm: Number((1676.0 + currentGaugeDev).toFixed(1)),
+                vibrationG: Number(Math.abs(currentVibZ).toFixed(2)),
+                confidenceScore: currentScore,
+                actionRequired: nearbyDefect.severity === 'HIGH' || nearbyDefect.severity === 'CRITICAL'
+                  ? 'Urgent track engineering inspection directive issued.'
+                  : 'Monitor during next maintenance cycle.',
+                acknowledged: false,
+                sensorTriggers: {
+                  vibrationSpike: Math.abs(currentVibZ) > 1.5,
+                  gaugeSpread: Math.abs(currentGaugeDev) > 8.0,
+                  opticalAnomaly: true
+                }
+              };
+              return [newRecord, ...prev];
+            }
+            return prev;
+          });
+        }
       }
 
       const point: TelemetryPoint = {
-        timestamp: now,
-        position: nextPos,
-        vibrationZ: curVibZ,
-        vibrationY: curVibY,
-        gaugeMm: measuredGauge,
-        gaugeDevMm: curGaugeDev,
-        confidenceScore: confidence,
-        status: fusionStatus,
-        laserSignalQuality: 98,
-        cameraSharpness: 94
+        position: Number(position.toFixed(2)),
+        speed,
+        vibrationZ: Number(currentVibZ.toFixed(2)),
+        vibrationY: Number(currentVibY.toFixed(2)),
+        gaugeMm: Number((1676.0 + currentGaugeDev).toFixed(1)),
+        gaugeDevMm: Number(currentGaugeDev.toFixed(1)),
+        cameraSharpness: Math.round(95 + (Math.random() - 0.5) * 6),
+        confidenceScore: Math.round(currentScore),
+        status: currentStatus,
+        timestamp: new Date().toLocaleTimeString()
       };
 
       setCurrentTelemetry(point);
 
-      setTelemetryHistory(prev => {
-        const updated = [...prev, point];
-        return updated.length > 40 ? updated.slice(updated.length - 40) : updated;
-      });
+      // Keep rolling telemetry history buffer of 60 points
+      setTelemetryHistory(prev => [...prev.slice(-59), point]);
 
       animationFrameId = requestAnimationFrame(tick);
     };
@@ -381,8 +250,78 @@ export default function App() {
     return () => cancelAnimationFrame(animationFrameId);
   }, [position, speed, isPlaying, isLooping, direction, targetDistance, trackLength, activeDefectZones]);
 
+  // Handlers
+  const handleTogglePlay = () => {
+    setIsPlaying(!isPlaying);
+  };
+
+  const handleStopRun = () => {
+    setIsPlaying(false);
+  };
+
+  const handleResetRun = () => {
+    setIsPlaying(false);
+    setPosition(0.0);
+  };
+
+  const handleToggleMute = () => {
+    setIsMuted(!isMuted);
+  };
+
+  const handleSeekPosition = (pos: number) => {
+    setPosition(pos);
+  };
+
+  const handleTrackLengthChange = (newLen: number) => {
+    setTrackLength(newLen);
+    if (targetDistance > newLen) setTargetDistance(newLen);
+    if (position > newLen) setPosition(newLen);
+  };
+
+  const handleInjectPresetScenario = (scenario: PresetScenario) => {
+    setIsPlaying(false);
+    setPosition(0.0);
+
+    if (scenario === 'smooth') {
+      setActiveDefectZones([]);
+      setDefectLogs([]);
+    } else if (scenario === 'corrugation') {
+      setActiveDefectZones([
+        { location: 0.85, defectType: 'Surface Corrugation', severity: 'HIGH', gaugeDevMm: 1.0, vibrationAmpG: 2.4 }
+      ]);
+    } else if (scenario === 'loose_joint') {
+      setActiveDefectZones([
+        { location: 1.45, defectType: 'Loose Joint / Fishplate Gap', severity: 'MEDIUM', gaugeDevMm: 3.5, vibrationAmpG: 1.9 }
+      ]);
+    } else if (scenario === 'gauge_widening') {
+      setActiveDefectZones([
+        { location: 1.95, defectType: 'Gauge Widening', severity: 'HIGH', gaugeDevMm: 14.0, vibrationAmpG: 0.6 }
+      ]);
+    } else if (scenario === 'combined_critical') {
+      setActiveDefectZones([
+        { location: 1.20, defectType: 'Rail Flaw / Crack', severity: 'CRITICAL', gaugeDevMm: 16.0, vibrationAmpG: 2.8 }
+      ]);
+    }
+  };
+
+  const handleInjectCustomDefect = (location: number, type: DefectType, severity: SeverityLevel) => {
+    const gaugeDev = type === 'Gauge Widening' ? 14.0 : 2.0;
+    const vibAmp = type === 'Surface Corrugation' ? 2.5 : 1.2;
+
+    setActiveDefectZones(prev => [
+      ...prev,
+      { location, defectType: type, severity, gaugeDevMm: gaugeDev, vibrationAmpG: vibAmp }
+    ]);
+  };
+
+  const handleStartFromPosition = (startPos: number, startDir: DriveDirection = 'FORWARD') => {
+    setPosition(startPos);
+    setDirection(startDir);
+    setIsPlaying(true);
+  };
+
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-amber-500 selection:text-slate-950">
+    <div className="min-h-screen bg-slate-100 text-slate-800 flex flex-col font-sans selection:bg-amber-400 selection:text-slate-950">
       {/* Top Navigation Bar */}
       <HeaderBar
         isMuted={isMuted}
@@ -403,7 +342,7 @@ export default function App() {
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-5">
 
         {/* ── DRIVE CONTROL BAR — above the track ── */}
-        <div className="bg-slate-900/90 border border-slate-800 rounded-xl px-4 py-3 shadow-sm flex flex-wrap items-center gap-3 font-mono text-xs">
+        <div className="bg-white border border-slate-200 rounded-xl px-4 py-3 shadow-xs flex flex-wrap items-center gap-3 font-mono text-xs">
 
           {/* Play / Pause */}
           <button
@@ -411,7 +350,7 @@ export default function App() {
             className={`px-4 py-2 rounded-lg font-bold flex items-center space-x-2 transition-all ${
               isPlaying
                 ? 'bg-amber-500 text-slate-950 hover:bg-amber-400'
-                : 'bg-emerald-500 text-slate-950 hover:bg-emerald-400'
+                : 'bg-emerald-600 text-white hover:bg-emerald-700'
             }`}
           >
             {isPlaying ? (
@@ -426,7 +365,7 @@ export default function App() {
           {isPlaying && (
             <button
               onClick={handleStopRun}
-              className="px-3 py-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 font-bold transition-colors"
+              className="px-3 py-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 font-bold transition-colors"
             >
               STOP
             </button>
@@ -435,13 +374,13 @@ export default function App() {
           {/* Reset */}
           <button
             onClick={handleResetRun}
-            className="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium border border-slate-700/60 transition-colors"
+            className="px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium border border-slate-300 transition-colors"
             title="Reset to 0.00m"
           >
             RESET
           </button>
 
-          <div className="w-px h-6 bg-slate-800 hidden sm:block" />
+          <div className="w-px h-6 bg-slate-200 hidden sm:block" />
 
           {/* Direction Toggle */}
           <div className="flex items-center gap-1.5">
@@ -449,8 +388,8 @@ export default function App() {
               onClick={() => setDirection('FORWARD')}
               className={`px-3 py-1.5 rounded-lg font-semibold border transition-all ${
                 direction === 'FORWARD'
-                  ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-400'
-                  : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:text-slate-200'
+                  ? 'bg-emerald-50 border-emerald-300 text-emerald-700 font-bold'
+                  : 'bg-slate-50 border-slate-200 text-slate-600 hover:text-slate-900'
               }`}
             >
               FORWARD
@@ -459,19 +398,19 @@ export default function App() {
               onClick={() => setDirection('REVERSE')}
               className={`px-3 py-1.5 rounded-lg font-semibold border transition-all ${
                 direction === 'REVERSE'
-                  ? 'bg-indigo-500/10 border-indigo-500/40 text-indigo-300'
-                  : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:text-slate-200'
+                  ? 'bg-indigo-50 border-indigo-300 text-indigo-700 font-bold'
+                  : 'bg-slate-50 border-slate-200 text-slate-600 hover:text-slate-900'
               }`}
             >
               REVERSE
             </button>
           </div>
 
-          <div className="w-px h-6 bg-slate-800 hidden sm:block" />
+          <div className="w-px h-6 bg-slate-200 hidden sm:block" />
 
           {/* Speed Slider */}
           <div className="flex items-center gap-2 min-w-[150px] max-w-xs">
-            <span className="text-slate-400 text-[11px] whitespace-nowrap">SPEED:</span>
+            <span className="text-slate-600 font-medium text-[11px] whitespace-nowrap">SPEED:</span>
             <input
               type="range"
               min="0.2"
@@ -479,16 +418,16 @@ export default function App() {
               step="0.1"
               value={speed}
               onChange={(e) => setSpeed(parseFloat(e.target.value))}
-              className="flex-1 accent-amber-400 cursor-pointer h-1.5 bg-slate-800 rounded-lg"
+              className="flex-1 accent-amber-500 cursor-pointer h-1.5 bg-slate-200 rounded-lg"
             />
-            <span className="text-amber-400 font-bold text-xs w-12 text-right">{speed.toFixed(1)}m/s</span>
+            <span className="text-amber-700 font-bold text-xs w-12 text-right">{speed.toFixed(1)}m/s</span>
           </div>
 
-          <div className="w-px h-6 bg-slate-800 hidden sm:block" />
+          <div className="w-px h-6 bg-slate-200 hidden sm:block" />
 
           {/* BO Encoder Run Distance Limit */}
           <div className="flex items-center gap-2 min-w-[160px] max-w-xs">
-            <span className="text-slate-400 text-[11px] whitespace-nowrap">LIMIT:</span>
+            <span className="text-slate-600 font-medium text-[11px] whitespace-nowrap">LIMIT:</span>
             <input
               type="range"
               min="0.1"
@@ -496,18 +435,18 @@ export default function App() {
               step={trackLength > 20 ? "1" : "0.1"}
               value={targetDistance}
               onChange={(e) => setTargetDistance(parseFloat(e.target.value))}
-              className="flex-1 accent-cyan-400 cursor-pointer h-1.5 bg-slate-800 rounded-lg"
+              className="flex-1 accent-cyan-600 cursor-pointer h-1.5 bg-slate-200 rounded-lg"
             />
-            <span className="text-cyan-400 font-bold text-xs w-12 text-right">{targetDistance.toFixed(1)}m</span>
+            <span className="text-cyan-700 font-bold text-xs w-12 text-right">{targetDistance.toFixed(1)}m</span>
           </div>
 
           {/* Live position readout */}
-          <div className="ml-auto bg-slate-950 border border-slate-800 px-3 py-1.5 rounded-lg flex items-center gap-2 text-xs">
-            <span className="w-2 h-2 rounded-full bg-amber-400" />
-            <span className="text-slate-400">POS:</span>
-            <span className="text-amber-400 font-bold">{position.toFixed(2)} m</span>
-            <span className="text-slate-600">/</span>
-            <span className="text-slate-400">{trackLength.toFixed(1)} m</span>
+          <div className="ml-auto bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg flex items-center gap-2 text-xs">
+            <span className="w-2 h-2 rounded-full bg-amber-500" />
+            <span className="text-slate-500">POS:</span>
+            <span className="text-slate-900 font-bold">{position.toFixed(2)} m</span>
+            <span className="text-slate-400">/</span>
+            <span className="text-slate-600">{trackLength.toFixed(1)} m</span>
           </div>
         </div>
 
@@ -582,7 +521,7 @@ export default function App() {
           activeAlert={activeAlert}
           isMuted={isMuted}
           onToggleMute={handleToggleMute}
-          onJumpToPosition={handleJumpToPosition}
+          onJumpToPosition={handleSeekPosition}
           onClearLogs={() => setDefectLogs([])}
           onOpenDefectDetail={(def) => {
             setSelectedDefectModal(def);
@@ -591,18 +530,22 @@ export default function App() {
         />
       </main>
 
-      {/* RDSO Inspection Report Modal */}
-      <ReportModal
-        isOpen={isReportModalOpen}
-        onClose={() => setIsReportModalOpen(false)}
-        defectLogs={defectLogs}
-        selectedDefect={selectedDefectModal}
-      />
-
-      {/* Footer Status Line */}
-      <footer className="border-t border-slate-900 bg-slate-950 py-3 px-4 text-center text-xs text-slate-500 font-mono">
-        <span>TrackSense Railway Track Monitoring System • Indian Railways RDSO Lab Prototype</span>
+      {/* Footer */}
+      <footer className="bg-white border-t border-slate-200 py-3 text-center text-xs font-mono text-slate-500">
+        TrackSense RDSO Demo Platform • Built for Raspberry Pi 4 Hardware Engine
       </footer>
+
+      {/* Inspection Directive Report Modal */}
+      {isReportModalOpen && (
+        <ReportModal
+          isOpen={isReportModalOpen}
+          onClose={() => setIsReportModalOpen(false)}
+          defects={defectLogs}
+          selectedDefect={selectedDefectModal}
+          currentTelemetry={currentTelemetry}
+          trackLength={trackLength}
+        />
+      )}
     </div>
   );
 }
