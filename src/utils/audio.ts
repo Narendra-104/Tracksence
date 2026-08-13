@@ -4,6 +4,7 @@ class TrackSenseAudioEngine {
   private ctx: AudioContext | null = null;
   private isMuted: boolean = false;
   private lastBuzzerTime: number = 0;
+  private lastClickTime: number = 0;
 
   private initContext() {
     if (!this.ctx && typeof window !== 'undefined') {
@@ -100,7 +101,7 @@ class TrackSenseAudioEngine {
   }
 
   // Plays alert warning buzzer tone when Defect Confidence Score is high
-  public playAlertBuzzer(severity: 'HIGH' | 'CRITICAL') {
+  public playAlertBuzzer(severity: 'HIGH' | 'CRITICAL' = 'HIGH') {
     if (this.isMuted) return;
     const nowMs = Date.now();
     if (nowMs - this.lastBuzzerTime < 800) return; // Throttle sound repetition
@@ -135,6 +136,29 @@ class TrackSenseAudioEngine {
       osc1.stop(now + 0.3);
       osc2.stop(now + 0.3);
     } catch {}
+  }
+
+  // Alias methods for App.tsx compatibility
+  public updateEngineSound(speed: number, playing: boolean) {
+    if (!playing || this.isMuted) return;
+    const nowMs = Date.now();
+    const interval = Math.max(120, 400 / (speed || 1));
+    if (nowMs - this.lastClickTime > interval) {
+      this.lastClickTime = nowMs;
+      this.playWheelClick();
+    }
+  }
+
+  public triggerJointClick() {
+    this.playWheelClick();
+  }
+
+  public triggerBuzzer() {
+    this.playAlertBuzzer('HIGH');
+  }
+
+  public stopEngine() {
+    // Engine stopped
   }
 }
 

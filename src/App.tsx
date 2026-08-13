@@ -185,7 +185,7 @@ export default function App() {
         if (currentScore > 65) {
           currentStatus = 'DEFECT';
           if (isPlaying) {
-            soundEngine.triggerJointClick();
+            soundEngine.playJoltSound(Math.abs(currentVibZ));
             soundEngine.triggerBuzzer();
             setActiveAlert(true);
             setTimeout(() => setActiveAlert(false), 2000);
@@ -252,6 +252,11 @@ export default function App() {
 
   // Handlers
   const handleTogglePlay = () => {
+    if (!isPlaying) {
+      soundEngine.triggerJointClick();
+    } else {
+      soundEngine.stopEngine();
+    }
     setIsPlaying(!isPlaying);
   };
 
