@@ -1,0 +1,6 @@
+{
+  "name": "TrackSense Dashboard",
+  "description": "Live interactive web dashboard for TrackSense sensor-fused railway track monitoring trolley",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
