@@ -56,7 +56,7 @@ export const LiveTrackVisualizer: React.FC<LiveTrackVisualizerProps> = ({
 
     // Animate sleepers when playing
     if (isPlaying) {
-      const shift = direction === 'FORWARD' ? 0.8 : -0.8;
+      const shift = direction === '' ? 0.8 : -0.8;
       tieOffsetRef.current = (tieOffsetRef.current + shift + 38) % 38;
     }
 
@@ -324,6 +324,7 @@ export const LiveTrackVisualizer: React.FC<LiveTrackVisualizerProps> = ({
       ctx.beginPath();
       ctx.moveTo(wx, wy);
       ctx.lineTo(wx + Math.cos(spokeAngle) * WHEEL_R * 0.85, wy + Math.sin(spokeAngle) * WHEEL_R * 0.85);
+        ctx.lineTo(wx + Math.cos(spokeAngle) * WHEEL_R * 1.0, wy + Math.sin(spokeAngle) * WHEEL_R * 1.0);
       ctx.stroke();
     });
 
@@ -456,7 +457,7 @@ export const LiveTrackVisualizer: React.FC<LiveTrackVisualizerProps> = ({
         <div className="absolute top-2 left-2 bg-white/90 backdrop-blur-xs border border-slate-200 px-2.5 py-1 rounded-lg font-mono text-[10px] flex items-center gap-1.5 shadow-xs">
           <span className={`w-1.5 h-1.5 rounded-full ${isPlaying ? 'bg-emerald-600' : 'bg-slate-400'}`} />
           <span className="text-slate-700 font-bold">
-            {isPlaying ? (direction === 'FORWARD' ? 'BO MOTOR FWD' : 'BO MOTOR REV') : 'L298N STOPPED'}
+            {isPlaying ? (direction === 'FORWARD' ? 'BO MOTOR FWD' : '') : 'L298N STOPPED'}
           </span>
         </div>
 
