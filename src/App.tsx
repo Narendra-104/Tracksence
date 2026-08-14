@@ -179,10 +179,11 @@ export default function App() {
           currentGaugeDev = 4.5 + Math.random() * 2.0;
         }
 
-        // Calculate AI confidence score
-        const vibFactor = Math.min(100, (Math.abs(currentVibZ) / 2.5) * 50);
-        const gaugeFactor = Math.min(100, (Math.abs(currentGaugeDev) / 15) * 50);
-        currentScore = Math.round(vibFactor + gaugeFactor);
+        // Map severity to confidence score so UI behaves perfectly
+        if (nearbyDefect.severity === 'CRITICAL') currentScore = 90 + Math.random() * 8;
+        else if (nearbyDefect.severity === 'HIGH') currentScore = 75 + Math.random() * 10;
+        else if (nearbyDefect.severity === 'MEDIUM') currentScore = 55 + Math.random() * 10;
+        else if (nearbyDefect.severity === 'LOW') currentScore = 35 + Math.random() * 10;
 
         if (currentScore > 65) {
           currentStatus = 'DEFECT';
@@ -227,23 +228,24 @@ export default function App() {
         }
       }
 
-      const point: TelemetryPoint = {
-        position: Number(position.toFixed(2)),
-        speed,
-        vibrationZ: Number(currentVibZ.toFixed(2)),
-        vibrationY: Number(currentVibY.toFixed(2)),
-        gaugeMm: Number((1676.0 + currentGaugeDev).toFixed(1)),
-        gaugeDevMm: Number(currentGaugeDev.toFixed(1)),
-        cameraSharpness: Math.round(95 + (Math.random() - 0.5) * 6),
-        confidenceScore: Math.round(currentScore),
-        status: currentStatus,
-        timestamp: new Date().toLocaleTimeString()
-      };
+      // ONLY stream new points into telemetry when playing
+      if (isPlaying) {
+        const point: TelemetryPoint = {
+          position: Number(position.toFixed(2)),
+          speed,
+          vibrationZ: Number(currentVibZ.toFixed(2)),
+          vibrationY: Number(currentVibY.toFixed(2)),
+          gaugeMm: Number((1676.0 + currentGaugeDev).toFixed(1)),
+          gaugeDevMm: Number(currentGaugeDev.toFixed(1)),
+          cameraSharpness: Math.round(95 + (Math.random() - 0.5) * 6),
+          confidenceScore: Math.round(currentScore),
+          status: currentStatus,
+          timestamp: new Date().toLocaleTimeString()
+        };
 
-      setCurrentTelemetry(point);
-
-      // Keep rolling telemetry history buffer of 60 points
-      setTelemetryHistory(prev => [...prev.slice(-59), point]);
+        setCurrentTelemetry(point);
+        setTelemetryHistory(prev => [...prev.slice(-59), point]);
+      }
 
       animationFrameId = requestAnimationFrame(tick);
     };
