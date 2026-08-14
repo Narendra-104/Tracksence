@@ -67,7 +67,7 @@ export default function App() {
     {
       id: 'def-2',
       timestamp: new Date(Date.now() - 180000).toLocaleTimeString(),
-      location: 1.0,
+      location: ,
       defectType: 'Gauge Widening',
       severity: 'HIGH',
       gaugeMm: 1690.0,
