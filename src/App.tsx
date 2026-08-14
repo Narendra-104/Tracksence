@@ -32,7 +32,8 @@ export default function App() {
   }>([
     { location: 0.85, defectType: 'Surface Corrugation', severity: 'HIGH', gaugeDevMm: 1.5, vibrationAmpG: 2.2 },
     { location: 1.45, defectType: 'Loose Joint / Fishplate Gap', severity: 'MEDIUM', gaugeDevMm: 3.0, vibrationAmpG: 1.8 },
-    { location: 1.95, defectType: 'Gauge Widening', severity: 'HIGH', gaugeDevMm: 14.0, vibrationAmpG: 0.7 }
+    { location: 1.95, defectType: 'Gauge Widening', severity: 'HIGH', gaugeDevMm: 14.0, vibrationAmpG: 0.7 },
+    { location: 1.0, defectType: 'Gauge Widening', severity: 'HIGH', gaugeDevMm: 14.0, vibrationAmpG: 0.7 }
   ]);
 
   // Logged Defect Records
