@@ -193,12 +193,12 @@ export default function App() {
             setActiveAlert(true);
             setTimeout(() => setActiveAlert(false), 2000);
           }
-        } else if (currentScore > 35) {
+        } else if (currentScore > 30) {
           currentStatus = 'ANOMALY';
         }
 
         // Auto log new defect if not already logged at this location
-        if (isPlaying && currentStatus === 'DEFECT') {
+        if (isPlaying && (currentStatus === 'DEFECT' || currentStatus === 'ANOMALY')) {
           setDefectLogs(prev => {
             const exists = prev.some(item => Math.abs(item.location - nearbyDefect.location) < 0.2);
             if (!exists) {
