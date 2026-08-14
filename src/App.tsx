@@ -63,6 +63,19 @@ export default function App() {
       actionRequired: 'Gauge tie realignment and spike replacement mandatory.',
       acknowledged: false,
       sensorTriggers: { vibrationSpike: false, gaugeSpread: true, opticalAnomaly: true }
+    },
+    {
+      id: 'def-2',
+      timestamp: new Date(Date.now() - 180000).toLocaleTimeString(),
+      location: 1.0,
+      defectType: 'Gauge Widening',
+      severity: 'HIGH',
+      gaugeMm: 1690.0,
+      vibrationG: 0.7,
+      confidenceScore: 85,
+      actionRequired: 'Gauge tie realignment and spike replacement mandatory.',
+      acknowledged: false,
+      sensorTriggers: { vibrationSpike: false, gaugeSpread: true, opticalAnomaly: true }
     }
   ]);
 
