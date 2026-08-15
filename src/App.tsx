@@ -449,6 +449,34 @@ export default function App() {
             <span className="text-cyan-700 font-bold text-xs w-12 text-right">{targetDistance.toFixed(1)}m</span>
           </div>
 
+          <div className="w-px h-6 bg-slate-200 hidden sm:block" />
+
+          {/* Quick Inject Defect (For Live Judge Demo) */}
+          <div className="flex items-center gap-1 bg-rose-50 border border-rose-200 p-1 rounded-lg">
+             <select 
+                className="bg-transparent text-rose-700 text-[11px] font-bold outline-none cursor-pointer pr-1"
+                id="quick-defect-select"
+             >
+                <option value="CRITICAL">CRITICAL FLAW</option>
+                <option value="HIGH">HIGH GAUGE DEV</option>
+                <option value="MEDIUM">MED LOOSE JOINT</option>
+             </select>
+             <button
+               onClick={() => {
+                 const sel = document.getElementById('quick-defect-select') as HTMLSelectElement;
+                 // Inject defect 1.5 meters ahead of current trolley position
+                 const injectLoc = Math.min(position + 1.5, trackLength - 0.2);
+                 if (sel.value === 'CRITICAL') handleInjectCustomDefect(injectLoc, 'Rail Flaw / Crack', 'CRITICAL');
+                 else if (sel.value === 'HIGH') handleInjectCustomDefect(injectLoc, 'Gauge Widening', 'HIGH');
+                 else handleInjectCustomDefect(injectLoc, 'Loose Joint / Fishplate Gap', 'MEDIUM');
+               }}
+               className="px-2 py-1 rounded bg-rose-600 text-white hover:bg-rose-700 font-bold text-[10px] transition-colors shadow-sm"
+               title="Inject defect 1.5m ahead"
+             >
+               INJECT
+             </button>
+          </div>
+
           {/* Live position readout */}
           <div className="ml-auto bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg flex items-center gap-2 text-xs">
             <span className="w-2 h-2 rounded-full bg-amber-500" />
