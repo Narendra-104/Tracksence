@@ -461,17 +461,33 @@ export default function App() {
                 <option value="HIGH">HIGH GAUGE DEV</option>
                 <option value="MEDIUM">MED LOOSE JOINT</option>
              </select>
+             <input 
+                type="number"
+                id="quick-defect-dist"
+                className="w-14 bg-white border border-rose-300 rounded px-1 text-[11px] text-slate-900 outline-none"
+                placeholder="Dist (m)"
+                step="0.1"
+                min="0"
+                max={trackLength}
+                title="Enter exact distance in meters (e.g. 5.5)"
+             />
              <button
                onClick={() => {
                  const sel = document.getElementById('quick-defect-select') as HTMLSelectElement;
-                 // Inject defect 1.5 meters ahead of current trolley position
-                 const injectLoc = Math.min(position + 1.5, trackLength - 0.2);
+                 const distInput = document.getElementById('quick-defect-dist') as HTMLInputElement;
+                 
+                 let injectLoc = parseFloat(distInput.value);
+                 // If no custom distance is typed, default to 1.5m ahead of trolley
+                 if (isNaN(injectLoc) || injectLoc <= 0) {
+                     injectLoc = Math.min(position + 1.5, trackLength - 0.2);
+                 }
+
                  if (sel.value === 'CRITICAL') handleInjectCustomDefect(injectLoc, 'Rail Flaw / Crack', 'CRITICAL');
                  else if (sel.value === 'HIGH') handleInjectCustomDefect(injectLoc, 'Gauge Widening', 'HIGH');
                  else handleInjectCustomDefect(injectLoc, 'Loose Joint / Fishplate Gap', 'MEDIUM');
                }}
                className="px-2 py-1 rounded bg-rose-600 text-white hover:bg-rose-700 font-bold text-[10px] transition-colors shadow-sm"
-               title="Inject defect 1.5m ahead"
+               title="Inject defect at specified distance"
              >
                INJECT
              </button>
