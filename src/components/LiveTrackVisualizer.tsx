@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Crosshair, Eye, AlertTriangle } from 'lucide-react';
+import { Crosshair, AlertTriangle } from 'lucide-react';
 import { DriveDirection, DefectRecord, TelemetryPoint } from '../types';
 
 interface LiveTrackVisualizerProps {
@@ -27,7 +27,7 @@ export const LiveTrackVisualizer: React.FC<LiveTrackVisualizerProps> = ({
   direction = 'FORWARD',
   trackLength = 2.50,
 }) => {
-  const [showCameraFeed, setShowCameraFeed] = useState(true);
+  const [showCameraFeed] = useState(true);
   const [hoveredPos, setHoveredPos] = useState<number | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animRef = useRef<number>(0);
@@ -404,18 +404,6 @@ export const LiveTrackVisualizer: React.FC<LiveTrackVisualizerProps> = ({
         </div>
 
         <div className="flex items-center space-x-2 text-xs font-mono">
-          <button
-            onClick={() => setShowCameraFeed(!showCameraFeed)}
-            className={`px-2.5 py-1 rounded-lg border transition-all flex items-center space-x-1.5 font-medium ${
-              showCameraFeed ? 'bg-amber-50 border-amber-300 text-amber-800' : 'bg-slate-50 border-slate-200 text-slate-600 hover:text-slate-900'
-            }`}
-              
-            >
-            < className="" />
-            <span>{showCameraFeed ? '' : ''}</span>
-            
-          </button>
-
           <div className="bg-slate-50 px-3 py-1 rounded-lg border border-slate-200 text-slate-700">
             <span className="text-slate-500 mr-1">POS:</span>
             <span className="text-slate-900 font-bold">{currentPosition.toFixed(2)} m</span>
