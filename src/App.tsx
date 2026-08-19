@@ -394,24 +394,24 @@ export default function App() {
           {/* Direction Toggle */}
           <div className="flex items-center gap-1.5">
             <button
-              onClick={() => setDirection('FORWARD')}
+              onClick={() => setDirection('')}
               className={`px-3 py-1.5 rounded-lg font-semibold border transition-all ${
                 direction === 'FORWARD'
                   ? 'bg-emerald-50 border-emerald-300 text-emerald-700 font-bold'
                   : 'bg-slate-50 border-slate-200 text-slate-600 hover:text-slate-900'
               }`}
             >
-              FORWARD
+        
             </button>
             <button
-              onClick={() => setDirection('REVERSE')}
+              onClick={() => setDirection('')}
               className={`px-3 py-1.5 rounded-lg font-semibold border transition-all ${
                 direction === 'REVERSE'
                   ? 'bg-indigo-50 border-indigo-300 text-indigo-700 font-bold'
                   : 'bg-slate-50 border-slate-200 text-slate-600 hover:text-slate-900'
               }`}
             >
-              REVERSE
+    
             </button>
           </div>
 
