@@ -411,7 +411,7 @@ export const LiveTrackVisualizer: React.FC<LiveTrackVisualizerProps> = ({
             }`}
               
             >
-            <Eye className="" />
+            < className="" />
             <span>{showCameraFeed ? '' : ''}</span>
             
           </button>
