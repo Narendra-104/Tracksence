@@ -409,6 +409,10 @@ export const LiveTrackVisualizer: React.FC<LiveTrackVisualizerProps> = ({
             className={`px-2.5 py-1 rounded-lg border transition-all flex items-center space-x-1.5 font-medium ${
               showCameraFeed ? 'bg-amber-50 border-amber-300 text-amber-800' : 'bg-slate-50 border-slate-200 text-slate-600 hover:text-slate-900'
             }`}
+              
+            >
+            <Eye className="" />
+            <span>{showCameraFeed ? '' : ''}</span>
             
           </button>
 
