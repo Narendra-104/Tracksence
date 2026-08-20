@@ -64,7 +64,6 @@ export default function App() {
       acknowledged: false,
       sensorTriggers: { vibrationSpike: false, gaugeSpread: true, opticalAnomaly: true }
     }
-   
   ]);
 
   // Telemetry stream history
@@ -351,21 +350,21 @@ export default function App() {
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-5">
 
         {/* ── DRIVE CONTROL BAR — above the track ── */}
-        <div className="bg-white border border-slate-200 rounded-xl px-4 py-3 shadow-xs flex flex-wrap items-center gap-3 font-mono text-xs">
+        <div className="bg-white border border-slate-200 rounded-xl px-4 py-3 shadow-xs flex flex-wrap items-center gap-3 font-mono text-sm">
 
           {/* Play / Pause */}
           <button
             onClick={handleTogglePlay}
-            className={`px-4 py-2 rounded-lg font-bold flex items-center space-x-2 transition-all ${
+            className={`px-4 py-2 rounded-lg font-bold flex items-center space-x-2 text-sm transition-all ${
               isPlaying
                 ? 'bg-amber-500 text-slate-950 hover:bg-amber-400'
                 : 'bg-emerald-600 text-white hover:bg-emerald-700'
             }`}
           >
             {isPlaying ? (
-              <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+              <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
             ) : (
-              <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+              <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
             )}
             <span>{isPlaying ? 'PAUSE' : 'START'}</span>
           </button>
@@ -374,7 +373,7 @@ export default function App() {
           {isPlaying && (
             <button
               onClick={handleStopRun}
-              className="px-3 py-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 font-bold transition-colors"
+              className="px-3.5 py-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 font-bold text-sm transition-colors"
             >
               STOP
             </button>
@@ -383,7 +382,7 @@ export default function App() {
           {/* Reset */}
           <button
             onClick={handleResetRun}
-            className="px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium border border-slate-300 transition-colors"
+            className="px-3.5 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-sm border border-slate-300 transition-colors"
             title="Reset to 0.00m"
           >
             RESET
@@ -394,32 +393,32 @@ export default function App() {
           {/* Direction Toggle */}
           <div className="flex items-center gap-1.5">
             <button
-              onClick={() => setDirection('')}
-              className={`px-3 py-1.5 rounded-lg font-semibold border transition-all ${
+              onClick={() => setDirection('FORWARD')}
+              className={`px-3 py-1.5 rounded-lg font-semibold text-sm border transition-all ${
                 direction === 'FORWARD'
                   ? 'bg-emerald-50 border-emerald-300 text-emerald-700 font-bold'
                   : 'bg-slate-50 border-slate-200 text-slate-600 hover:text-slate-900'
               }`}
             >
-        
+              FORWARD
             </button>
             <button
-              onClick={() => setDirection('')}
-              className={`px-3 py-1.5 rounded-lg font-semibold border transition-all ${
+              onClick={() => setDirection('REVERSE')}
+              className={`px-3 py-1.5 rounded-lg font-semibold text-sm border transition-all ${
                 direction === 'REVERSE'
                   ? 'bg-indigo-50 border-indigo-300 text-indigo-700 font-bold'
                   : 'bg-slate-50 border-slate-200 text-slate-600 hover:text-slate-900'
               }`}
             >
-    
+              REVERSE
             </button>
           </div>
 
           <div className="w-px h-6 bg-slate-200 hidden sm:block" />
 
           {/* Speed Slider */}
-          <div className="flex items-center gap-2 min-w-[150px] max-w-xs">
-            <span className="text-slate-600 font-medium text-[11px] whitespace-nowrap">SPEED:</span>
+          <div className="flex items-center gap-2 min-w-[160px] max-w-xs">
+            <span className="text-slate-600 font-medium text-xs whitespace-nowrap">SPEED:</span>
             <input
               type="range"
               min="0.2"
@@ -429,14 +428,14 @@ export default function App() {
               onChange={(e) => setSpeed(parseFloat(e.target.value))}
               className="flex-1 accent-amber-500 cursor-pointer h-1.5 bg-slate-200 rounded-lg"
             />
-            <span className="text-amber-700 font-bold text-xs w-12 text-right">{speed.toFixed(1)}m/s</span>
+            <span className="text-amber-700 font-bold text-sm w-14 text-right">{speed.toFixed(1)}m/s</span>
           </div>
 
           <div className="w-px h-6 bg-slate-200 hidden sm:block" />
 
           {/* BO Encoder Run Distance Limit */}
-          <div className="flex items-center gap-2 min-w-[160px] max-w-xs">
-            <span className="text-slate-600 font-medium text-[11px] whitespace-nowrap">LIMIT:</span>
+          <div className="flex items-center gap-2 min-w-[170px] max-w-xs">
+            <span className="text-slate-600 font-medium text-xs whitespace-nowrap">LIMIT:</span>
             <input
               type="range"
               min="0.1"
@@ -446,56 +445,56 @@ export default function App() {
               onChange={(e) => setTargetDistance(parseFloat(e.target.value))}
               className="flex-1 accent-cyan-600 cursor-pointer h-1.5 bg-slate-200 rounded-lg"
             />
-            <span className="text-cyan-700 font-bold text-xs w-12 text-right">{targetDistance.toFixed(1)}m</span>
+            <span className="text-cyan-700 font-bold text-sm w-14 text-right">{targetDistance.toFixed(1)}m</span>
           </div>
 
           <div className="w-px h-6 bg-slate-200 hidden sm:block" />
 
           {/* Quick Inject Defect (For Live Judge Demo) */}
-          <div className="flex items-center gap-1 bg-rose-50 border border-rose-200 p-1 rounded-lg">
-             <select 
-                className="bg-transparent text-rose-700 text-[11px] font-bold outline-none cursor-pointer pr-1"
-                id="quick-defect-select"
-             >
-                <option value="CRITICAL">CRITICAL FLAW</option>
-                <option value="HIGH">HIGH GAUGE DEV</option>
-                <option value="MEDIUM">MED LOOSE JOINT</option>
-             </select>
-             <input 
-                type="number"
-                id="quick-defect-dist"
-                className="w-14 bg-white border border-rose-300 rounded px-1 text-[11px] text-slate-900 outline-none"
-                placeholder="Dist (m)"
-                step="0.1"
-                min="0"
-                max={trackLength}
-                title="Enter exact distance in meters (e.g. 5.5)"
-             />
-             <button
-               onClick={() => {
-                 const sel = document.getElementById('quick-defect-select') as HTMLSelectElement;
-                 const distInput = document.getElementById('quick-defect-dist') as HTMLInputElement;
-                 
-                 let injectLoc = parseFloat(distInput.value);
-                 // If no custom distance is typed, default to 1.5m ahead of trolley
-                 if (isNaN(injectLoc) || injectLoc <= 0) {
-                     injectLoc = Math.min(position + 1.5, trackLength - 0.2);
-                 }
+          <div className="flex items-center gap-1.5 bg-rose-50 border border-rose-200 p-1.5 rounded-lg">
+            <select 
+              className="bg-transparent text-rose-700 text-xs font-bold outline-none cursor-pointer pr-1"
+              id="quick-defect-select"
+            >
+              <option value="CRITICAL">CRITICAL FLAW</option>
+              <option value="HIGH">HIGH GAUGE DEV</option>
+              <option value="MEDIUM">MED LOOSE JOINT</option>
+            </select>
+            <input 
+              type="number"
+              id="quick-defect-dist"
+              className="w-16 bg-white border border-rose-300 rounded px-1.5 py-0.5 text-xs text-slate-900 outline-none"
+              placeholder="Dist (m)"
+              step="0.1"
+              min="0"
+              max={trackLength}
+              title="Enter exact distance in meters (e.g. 5.5)"
+            />
+            <button
+              onClick={() => {
+                const sel = document.getElementById('quick-defect-select') as HTMLSelectElement;
+                const distInput = document.getElementById('quick-defect-dist') as HTMLInputElement;
+                
+                let injectLoc = parseFloat(distInput.value);
+                // If no custom distance is typed, default to 1.5m ahead of trolley
+                if (isNaN(injectLoc) || injectLoc <= 0) {
+                  injectLoc = Math.min(position + 1.5, trackLength - 0.2);
+                }
 
-                 if (sel.value === 'CRITICAL') handleInjectCustomDefect(injectLoc, 'Rail Flaw / Crack', 'CRITICAL');
-                 else if (sel.value === 'HIGH') handleInjectCustomDefect(injectLoc, 'Gauge Widening', 'HIGH');
-                 else handleInjectCustomDefect(injectLoc, 'Loose Joint / Fishplate Gap', 'MEDIUM');
-               }}
-               className="px-2 py-1 rounded bg-rose-600 text-white hover:bg-rose-700 font-bold text-[10px] transition-colors shadow-sm"
-               title="Inject defect at specified distance"
-             >
-               INJECT
-             </button>
+                if (sel.value === 'CRITICAL') handleInjectCustomDefect(injectLoc, 'Rail Flaw / Crack', 'CRITICAL');
+                else if (sel.value === 'HIGH') handleInjectCustomDefect(injectLoc, 'Gauge Widening', 'HIGH');
+                else handleInjectCustomDefect(injectLoc, 'Loose Joint / Fishplate Gap', 'MEDIUM');
+              }}
+              className="px-2.5 py-1 rounded bg-rose-600 text-white hover:bg-rose-700 font-bold text-xs transition-colors shadow-xs"
+              title="Inject defect at specified distance"
+            >
+              INJECT
+            </button>
           </div>
 
           {/* Live position readout */}
-          <div className="ml-auto bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg flex items-center gap-2 text-xs">
-            <span className="w-2 h-2 rounded-full bg-amber-500" />
+          <div className="ml-auto bg-slate-50 border border-slate-200 px-3.5 py-1.5 rounded-lg flex items-center gap-2 text-sm">
+            <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
             <span className="text-slate-500">POS:</span>
             <span className="text-slate-900 font-bold">{position.toFixed(2)} m</span>
             <span className="text-slate-400">/</span>
@@ -567,7 +566,6 @@ export default function App() {
         </div>
 
 
-
         {/* Row 4: Auto-populating Alert & Log System Table */}
         <AlertAndLogsPanel
           defects={defectLogs}
@@ -584,7 +582,7 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-slate-200 py-3 text-center text-xs font-mono text-slate-500">
+      <footer className="bg-white border-t border-slate-200 py-3 text-center text-sm font-mono text-slate-500">
         TrackSense RDSO Demo Platform • Built for Raspberry Pi 4 Hardware Engine
       </footer>
 
