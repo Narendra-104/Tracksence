@@ -329,7 +329,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 text-slate-800 flex flex-col font-sans selection:bg-amber-400 selection:text-slate-950">
+    <div className="min-h-screen bg-slate-100 text-slate-800 flex flex-col font-['Arial_Black',gadget,sans-serif] text-base selection:bg-amber-400 selection:text-slate-950">
       {/* Top Navigation Bar */}
       <HeaderBar
         isMuted={isMuted}
@@ -350,21 +350,21 @@ export default function App() {
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-5">
 
         {/* ── DRIVE CONTROL BAR — above the track ── */}
-        <div className="bg-white border border-slate-200 rounded-xl px-4 py-3 shadow-xs flex flex-wrap items-center gap-3 font-mono text-sm">
+        <div className="bg-white border border-slate-200 rounded-xl px-4 py-3 shadow-xs flex flex-wrap items-center gap-3 text-base">
 
           {/* Play / Pause */}
           <button
             onClick={handleTogglePlay}
-            className={`px-4 py-2 rounded-lg font-bold flex items-center space-x-2 text-sm transition-all ${
+            className={`px-5 py-2.5 rounded-lg flex items-center space-x-2 text-base transition-all ${
               isPlaying
                 ? 'bg-amber-500 text-slate-950 hover:bg-amber-400'
                 : 'bg-emerald-600 text-white hover:bg-emerald-700'
             }`}
           >
             {isPlaying ? (
-              <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+              <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
             ) : (
-              <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+              <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
             )}
             <span>{isPlaying ? 'PAUSE' : 'START'}</span>
           </button>
@@ -373,7 +373,7 @@ export default function App() {
           {isPlaying && (
             <button
               onClick={handleStopRun}
-              className="px-3.5 py-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 font-bold text-sm transition-colors"
+              className="px-4 py-2.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 text-base transition-colors"
             >
               STOP
             </button>
@@ -382,7 +382,7 @@ export default function App() {
           {/* Reset */}
           <button
             onClick={handleResetRun}
-            className="px-3.5 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-sm border border-slate-300 transition-colors"
+            className="px-4 py-2.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-base border border-slate-300 transition-colors"
             title="Reset to 0.00m"
           >
             RESET
@@ -394,9 +394,9 @@ export default function App() {
           <div className="flex items-center gap-1.5">
             <button
               onClick={() => setDirection('FORWARD')}
-              className={`px-3 py-1.5 rounded-lg font-semibold text-sm border transition-all ${
+              className={`px-3.5 py-2 rounded-lg text-sm border transition-all ${
                 direction === 'FORWARD'
-                  ? 'bg-emerald-50 border-emerald-300 text-emerald-700 font-bold'
+                  ? 'bg-emerald-50 border-emerald-300 text-emerald-700'
                   : 'bg-slate-50 border-slate-200 text-slate-600 hover:text-slate-900'
               }`}
             >
@@ -404,9 +404,9 @@ export default function App() {
             </button>
             <button
               onClick={() => setDirection('REVERSE')}
-              className={`px-3 py-1.5 rounded-lg font-semibold text-sm border transition-all ${
+              className={`px-3.5 py-2 rounded-lg text-sm border transition-all ${
                 direction === 'REVERSE'
-                  ? 'bg-indigo-50 border-indigo-300 text-indigo-700 font-bold'
+                  ? 'bg-indigo-50 border-indigo-300 text-indigo-700'
                   : 'bg-slate-50 border-slate-200 text-slate-600 hover:text-slate-900'
               }`}
             >
@@ -417,8 +417,8 @@ export default function App() {
           <div className="w-px h-6 bg-slate-200 hidden sm:block" />
 
           {/* Speed Slider */}
-          <div className="flex items-center gap-2 min-w-[160px] max-w-xs">
-            <span className="text-slate-600 font-medium text-xs whitespace-nowrap">SPEED:</span>
+          <div className="flex items-center gap-2 min-w-[170px] max-w-xs">
+            <span className="text-slate-600 text-xs whitespace-nowrap">SPEED:</span>
             <input
               type="range"
               min="0.2"
@@ -426,16 +426,16 @@ export default function App() {
               step="0.1"
               value={speed}
               onChange={(e) => setSpeed(parseFloat(e.target.value))}
-              className="flex-1 accent-amber-500 cursor-pointer h-1.5 bg-slate-200 rounded-lg"
+              className="flex-1 accent-amber-500 cursor-pointer h-2 bg-slate-200 rounded-lg"
             />
-            <span className="text-amber-700 font-bold text-sm w-14 text-right">{speed.toFixed(1)}m/s</span>
+            <span className="text-amber-700 text-base w-16 text-right">{speed.toFixed(1)}m/s</span>
           </div>
 
           <div className="w-px h-6 bg-slate-200 hidden sm:block" />
 
           {/* BO Encoder Run Distance Limit */}
-          <div className="flex items-center gap-2 min-w-[170px] max-w-xs">
-            <span className="text-slate-600 font-medium text-xs whitespace-nowrap">LIMIT:</span>
+          <div className="flex items-center gap-2 min-w-[180px] max-w-xs">
+            <span className="text-slate-600 text-xs whitespace-nowrap">LIMIT:</span>
             <input
               type="range"
               min="0.1"
@@ -443,17 +443,17 @@ export default function App() {
               step={trackLength > 20 ? "1" : "0.1"}
               value={targetDistance}
               onChange={(e) => setTargetDistance(parseFloat(e.target.value))}
-              className="flex-1 accent-cyan-600 cursor-pointer h-1.5 bg-slate-200 rounded-lg"
+              className="flex-1 accent-cyan-600 cursor-pointer h-2 bg-slate-200 rounded-lg"
             />
-            <span className="text-cyan-700 font-bold text-sm w-14 text-right">{targetDistance.toFixed(1)}m</span>
+            <span className="text-cyan-700 text-base w-16 text-right">{targetDistance.toFixed(1)}m</span>
           </div>
 
           <div className="w-px h-6 bg-slate-200 hidden sm:block" />
 
           {/* Quick Inject Defect (For Live Judge Demo) */}
-          <div className="flex items-center gap-1.5 bg-rose-50 border border-rose-200 p-1.5 rounded-lg">
+          <div className="flex items-center gap-2 bg-rose-50 border border-rose-200 p-2 rounded-lg">
             <select 
-              className="bg-transparent text-rose-700 text-xs font-bold outline-none cursor-pointer pr-1"
+              className="bg-transparent text-rose-700 text-xs outline-none cursor-pointer pr-1"
               id="quick-defect-select"
             >
               <option value="CRITICAL">CRITICAL FLAW</option>
@@ -463,7 +463,7 @@ export default function App() {
             <input 
               type="number"
               id="quick-defect-dist"
-              className="w-16 bg-white border border-rose-300 rounded px-1.5 py-0.5 text-xs text-slate-900 outline-none"
+              className="w-20 bg-white border border-rose-300 rounded px-2 py-1 text-xs text-slate-900 outline-none"
               placeholder="Dist (m)"
               step="0.1"
               min="0"
@@ -485,7 +485,7 @@ export default function App() {
                 else if (sel.value === 'HIGH') handleInjectCustomDefect(injectLoc, 'Gauge Widening', 'HIGH');
                 else handleInjectCustomDefect(injectLoc, 'Loose Joint / Fishplate Gap', 'MEDIUM');
               }}
-              className="px-2.5 py-1 rounded bg-rose-600 text-white hover:bg-rose-700 font-bold text-xs transition-colors shadow-xs"
+              className="px-3 py-1 rounded bg-rose-600 text-white hover:bg-rose-700 text-xs transition-colors shadow-xs"
               title="Inject defect at specified distance"
             >
               INJECT
@@ -493,10 +493,10 @@ export default function App() {
           </div>
 
           {/* Live position readout */}
-          <div className="ml-auto bg-slate-50 border border-slate-200 px-3.5 py-1.5 rounded-lg flex items-center gap-2 text-sm">
-            <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
+          <div className="ml-auto bg-slate-50 border border-slate-200 px-4 py-2 rounded-lg flex items-center gap-2 text-base">
+            <span className="w-3 h-3 rounded-full bg-amber-500" />
             <span className="text-slate-500">POS:</span>
-            <span className="text-slate-900 font-bold">{position.toFixed(2)} m</span>
+            <span className="text-slate-900">{position.toFixed(2)} m</span>
             <span className="text-slate-400">/</span>
             <span className="text-slate-600">{trackLength.toFixed(1)} m</span>
           </div>
@@ -582,7 +582,7 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-slate-200 py-3 text-center text-sm font-mono text-slate-500">
+      <footer className="bg-white border-t border-slate-200 py-3 text-center text-base text-slate-500">
         TrackSense RDSO Demo Platform • Built for Raspberry Pi 4 Hardware Engine
       </footer>
 
