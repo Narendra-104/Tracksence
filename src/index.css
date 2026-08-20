@@ -1,1 +1,19 @@
 @import "tailwindcss";
+
+/* Apply Arial Black globally to the entire dashboard */
+* {
+  font-family: 'Arial Black', 'Arial Bold', Arial, sans-serif !important;
+  font-size: 13px;
+}
+
+/* Headings slightly larger */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Arial Black', 'Arial Bold', Arial, sans-serif !important;
+  font-size: 15px;
+}
+
+/* Monospace areas keep ratio but still Arial Black */
+.font-mono, code, pre {
+  font-family: 'Arial Black', 'Arial Bold', Arial, sans-serif !important;
+  font-size: 12px;
+}
